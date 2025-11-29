@@ -1,0 +1,10 @@
+{
+  "Home": {
+    "successTitle": "Success",
+    "errorTitle": "Error",
+    "successLogin": "You have login correctly.",
+    "errorLogin": "Wrong credentials",
+    "errorGeneral": "Something is wrong, please try again.",
+    "successMessage": "Operation with success"
+  }
+}
