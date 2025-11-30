@@ -5,11 +5,23 @@ import Image from "next/image";
 import { SearchOutlined } from "@ant-design/icons";
 import { Button, Divider, Input } from "antd";
 import LocationSelect from "../LocationSelect/LocationSelect";
+import LoginModal from "../LoginModal/LoginModal";
+import SearchBar from "../SearchBar/SearchBar";
+import useAuthStore from "../../hooks/useAuthStore";
+import { useState } from "react";
 
 const Header = (props: {
   sidebarOpen: string | boolean | undefined;
   setSidebarOpen: (arg0: boolean) => void;
+  showMenu?: boolean;
 }) => {
+  const { token, client, clearAuth } = useAuthStore();
+  const [loginModalOpen, setLoginModalOpen] = useState(false);
+  const isLoggedIn = !!token;
+
+  const handleLogout = () => {
+    clearAuth();
+  };
   return (
     <>
       <header className="sticky top-0 z-999 flex w-full bg-white drop-shadow-1 dark:bg-boxdark dark:drop-shadow-none">
@@ -69,23 +81,7 @@ const Header = (props: {
           </Link>
 
           <div className="hidden sm:block">
-            <form action="https://formbold.com/s/unique_form_id" method="POST">
-              <div className="relative">
-                <Input
-                  placeholder="¿Qué antojo tienes hoy?"
-                  className="rounded-4xl h-[50px] w-full bg-body font-medium focus:outline-none xl:w-100"
-                  allowClear
-                  variant="borderless"
-                  suffix={
-                    <Button
-                      shape="circle"
-                      className="border-none bg-primary text-white"
-                      icon={<SearchOutlined />}
-                    />
-                  }
-                />
-              </div>
-            </form>
+            <SearchBar />
           </div>
 
           <LocationSelect />
@@ -109,51 +105,72 @@ const Header = (props: {
             </ul>
 
             {/* <!-- User Area --> */}
-            <Image
-              width={20}
-              height={30}
-              src={"/images/header/person.svg"}
-              alt="Logo"
-            />
-            <DropdownUser />
+            {isLoggedIn ? (
+              <>
+                <Image
+                  width={20}
+                  height={30}
+                  src={"/images/header/person.svg"}
+                  alt="Logo"
+                />
+                <DropdownUser 
+                  onLogout={handleLogout} 
+                  clientName={client ? `${client.firstName} ${client.lastName}` : undefined}
+                />
+              </>
+            ) : (
+              <Button
+                type="primary"
+                onClick={() => setLoginModalOpen(true)}
+                className="bg-primary border-primary"
+              >
+                Iniciar Sesión
+              </Button>
+            )}
             {/* <!-- User Area --> */}
           </div>
         </div>
       </header>
-      <div className="hidden justify-between bg-primary px-[20px] py-[20px] md:flex">
-        <div className="flex items-start space-x-0 ">
-          <div className="flex h-[40px] w-[120px] items-center justify-center rounded-2xl bg-activelink text-center text-xs md:text-lg">
-            <Link href="#" className="font-bold text-white" rel="noreferrer">
-              Inicio
-            </Link>
+      <LoginModal
+        open={loginModalOpen}
+        onClose={() => setLoginModalOpen(false)}
+      />
+      {props.showMenu && (
+        <div className="hidden justify-between bg-primary px-[20px] py-[20px] md:flex">
+          <div className="flex items-start space-x-0 ">
+            <div className="flex h-[40px] w-[120px] items-center justify-center rounded-2xl bg-activelink text-center text-xs md:text-lg">
+              <Link href="#" className="font-bold text-white" rel="noreferrer">
+                Inicio
+              </Link>
+            </div>
+            <div className="flex h-[40px] w-[120px] items-center justify-center rounded-2xl bg-transparent text-center text-xs md:text-lg">
+              <Link href="/" className="font-bold text-white" rel="noreferrer">
+                Categorías
+              </Link>
+            </div>
+            <div className="flex h-[40px] w-[120px] items-center justify-center rounded-2xl bg-transparent text-center text-xs md:text-lg">
+              <Link href="/" className="font-bold text-white" rel="noreferrer">
+                Productos
+              </Link>
+            </div>
+            <div className="flex h-[40px] w-[120px] items-center justify-center rounded-2xl bg-transparent text-center text-xs md:text-lg">
+              <Link href="/" className="font-bold text-white" rel="noreferrer">
+                Cupones
+              </Link>
+            </div>
+            <div className="flex h-[40px] w-[120px] items-center justify-center rounded-2xl bg-transparent text-center text-xs md:text-lg">
+              <Link href="/" className="font-bold text-white" rel="noreferrer">
+                Ayuda
+              </Link>
+            </div>
           </div>
-          <div className="flex h-[40px] w-[120px] items-center justify-center rounded-2xl bg-transparent text-center text-xs md:text-lg">
-            <Link href="/" className="font-bold text-white" rel="noreferrer">
-              Categorías
-            </Link>
-          </div>
-          <div className="flex h-[40px] w-[120px] items-center justify-center rounded-2xl bg-transparent text-center text-xs md:text-lg">
-            <Link href="/" className="font-bold text-white" rel="noreferrer">
-              Productos
-            </Link>
-          </div>
-          <div className="flex h-[40px] w-[120px] items-center justify-center rounded-2xl bg-transparent text-center text-xs md:text-lg">
-            <Link href="/" className="font-bold text-white" rel="noreferrer">
-              Cupones
-            </Link>
-          </div>
-          <div className="flex h-[40px] w-[120px] items-center justify-center rounded-2xl bg-transparent text-center text-xs md:text-lg">
-            <Link href="/" className="font-bold text-white" rel="noreferrer">
-              Ayuda
+          <div className="ml-auto flex h-[40px] w-[210px] items-center justify-center rounded-2xl bg-transparent bg-white text-center text-xs md:text-lg">
+            <Link href="/" className="font-bold text-primary" rel="noreferrer">
+              Hacer Pedido
             </Link>
           </div>
         </div>
-        <div className="ml-auto flex h-[40px] w-[210px] items-center justify-center rounded-2xl bg-transparent bg-white text-center text-xs md:text-lg">
-          <Link href="/" className="font-bold text-primary" rel="noreferrer">
-            Hacer Pedido
-          </Link>
-        </div>
-      </div>
+      )}
     </>
   );
 };

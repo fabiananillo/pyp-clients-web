@@ -14,8 +14,8 @@ const MostBoughtGrid = () => {
     onCompleted: (e: any) => {
       setListData(e.companiesMostBought);
     },
-    onError: () => {
-      //console.error(error);
+    onError: (error) => {
+      console.error(error);
     },
   });
 

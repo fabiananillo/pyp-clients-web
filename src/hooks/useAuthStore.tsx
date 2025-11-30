@@ -4,16 +4,18 @@ import { persist, createJSONStorage } from "zustand/middleware";
 
 interface AuthStore {
   token: string | null;
-  setToken: (newToken: string) => void;
-  clearToken: () => void;
+  client: any | null;
+  setAuth: (token: string, client: any) => void;
+  clearAuth: () => void;
 }
 
 const useAuthStore = create<any>(
   persist<AuthStore>(
     (set) => ({
       token: null,
-      setToken: (newToken: string) => set({ token: newToken }),
-      clearToken: () => set({ token: null }),
+      client: null,
+      setAuth: (token: string, client: any) => set({ token, client }),
+      clearAuth: () => set({ token: null, client: null }),
     }),
     {
       name: "token", 

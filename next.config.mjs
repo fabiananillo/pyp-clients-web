@@ -9,12 +9,12 @@ const nextConfig = {
     remotePatterns: [
       {
         protocol: 'https',
-        hostname: 'pyp-bucket.s3.amazonaws.com',
+        hostname: 'pyp-general-app.s3.us-east-1.amazonaws.com',
         pathname: '**',
       },
       {
         protocol: 'https',
-        hostname: 'pyp-bucket.s3.us-east-1.amazonaws.com',
+        hostname: 'pyp-general-app.s3.us-east-1.amazonaws.com',
         pathname: '**',
       },
     ],

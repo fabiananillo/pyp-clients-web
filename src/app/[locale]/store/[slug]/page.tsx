@@ -1,6 +1,6 @@
 "use client";
 import ProductsGrid from "@/components/Grid/ProductsGrid";
-import DefaultLayout from "@/components/Layouts/DefaultLayout";
+import StoreLayout from "@/components/Layouts/StoreLayout";
 import Loading from "@/components/Loading/Loading";
 import StoreCard from "@/components/StoreCard/StoreCard";
 
@@ -12,11 +12,15 @@ import {
 } from "@ant-design/icons";
 import { useQuery } from "@apollo/client";
 import { FloatButton } from "antd";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import useCartStore from "@/hooks/useCartStore";
+import BranchSelector from "@/components/BranchSelector/BranchSelector";
 //import { useMessages } from "next-intl";
 
 export default function Store({ params }: { params: { slug: string } }) {
   const [company, setCompany] = useState<any>();
+  const [showBranchSelector, setShowBranchSelector] = useState(false);
+  const { branchId, setBranchId } = useCartStore();
   //const messages = useMessages();
 
   const slug = params.slug;
@@ -26,11 +30,19 @@ export default function Store({ params }: { params: { slug: string } }) {
     skip: !slug, // No ejecutar la consulta si no hay slug
     onCompleted: (e: any) => {
       setCompany(e.companiesBySlug);
+      if (!branchId && e.companiesBySlug?.id) {
+        setShowBranchSelector(true);
+      }
     },
     onError: () => {
       //console.error(error);
     },
   });
+
+  const handleBranchSelected = (selectedBranchId: string) => {
+    setBranchId(selectedBranchId);
+    setShowBranchSelector(false);
+  };
 
   if (loading) return <Loading />;
 
@@ -38,7 +50,12 @@ export default function Store({ params }: { params: { slug: string } }) {
 
   return (
     <>
-      <DefaultLayout>
+      <BranchSelector
+        open={showBranchSelector}
+        companyId={company?.id}
+        onBranchSelected={handleBranchSelected}
+      />
+      <StoreLayout storeName={company?.name} storeSlug={slug}>
         <div className="flex flex-col md:flex-row">
           <StoreCard company={company} />
           <div className="flex w-full flex-col">
@@ -54,7 +71,7 @@ export default function Store({ params }: { params: { slug: string } }) {
             Cambiar Sucursal
           </FloatButton>
         </div>
-      </DefaultLayout>
+      </StoreLayout>
     </>
   );
 }

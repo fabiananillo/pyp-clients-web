@@ -23,13 +23,14 @@ const LocationSelect = () => {
     },
   });
 
-  useQuery(CITY_BY_LOCATION, {
+  const { refetch: getCityByLocation } = useQuery(CITY_BY_LOCATION, {
     variables: {
       getLocationInput: {
         latitude: coords[0],
         longitude: coords[1],
       },
     },
+    skip: coords.length === 0,
     onCompleted: (data) => {
       setCity({
         id: data.cityByLocation.city.id,
@@ -44,6 +45,10 @@ const LocationSelect = () => {
 
   const error = () => {
     setModalOpen(true);
+  };
+
+  const handleModalOk = () => {
+    setModalOpen(false);
   };
 
   useEffect(() => {
@@ -62,6 +67,17 @@ const LocationSelect = () => {
     }
   }, [city]);
 
+  useEffect(() => {
+    if (coords.length > 0) {
+      getCityByLocation({
+        getLocationInput: {
+          latitude: coords[0],
+          longitude: coords[1],
+        },
+      });
+    }
+  }, [coords, getCityByLocation]);
+
   if (loading) return <Loading />;
 
   const handleChange = (value: string) => {
@@ -75,10 +91,13 @@ const LocationSelect = () => {
         title="Aviso"
         centered
         open={modalOpen}
-        footer={null}
-        closable={false}
+        onOk={handleModalOk}
+        onCancel={handleModalOk}
+        okText="Entendido"
+        cancelText="Cerrar"
       >
-        Debe aceptar los permisos de ubicación
+        <p>Debe aceptar los permisos de ubicación para detectar automáticamente su ciudad.</p>
+        <p>Puede seleccionar manualmente su ciudad desde la lista desplegable.</p>
       </Modal>
       <div className="mr-0">
         <Image
